@@ -177,3 +177,7 @@ app.delete('/tasks/:id', (req, res) => {
   res.status(204).send();
  
 });
+// ---------------------------------------------------------------------------
+// Stage 5 — Swagger UI at /docs
+// ---------------------------------------------------------------------------
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
