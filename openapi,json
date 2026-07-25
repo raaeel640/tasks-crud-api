@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Books API",
+    "title": "Task API",
     "version": "1.0",
-    "description": "In-memory CRUD API for books."
+    "description": "In-memory CRUD API for tasks."
   },
   "servers": [
     {
@@ -11,15 +11,15 @@
     }
   ],
   "paths": {
-    "/books": {
+    "/tasks": {
       "get": {
-        "summary": "List books",
-        "operationId": "listBooks",
+        "summary": "List tasks",
+        "operationId": "listTasks",
         "parameters": [
           {
-            "name": "available",
+            "name": "done",
             "in": "query",
-            "description": "Filter by availability status",
+            "description": "Filter by completion status",
             "schema": {
               "type": "boolean"
             }
@@ -27,22 +27,22 @@
           {
             "name": "search",
             "in": "query",
-            "description": "Filter books whose title contains this word",
+            "description": "Filter tasks whose title contains this word",
             "schema": {
               "type": "string",
-              "example": "The Art of Overthinking"
+              "example": "milk"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Matching books",
+            "description": "Matching tasks",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Book"
+                    "$ref": "#/components/schemas/Task"
                   }
                 }
               }
@@ -61,25 +61,25 @@
         }
       },
       "post": {
-        "summary": "Create a book",
-        "operationId": "createBook",
+        "summary": "Create a task",
+        "operationId": "createTask",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateBookRequest"
+                "$ref": "#/components/schemas/CreateTaskRequest"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Book created",
+            "description": "Task created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Book"
+                  "$ref": "#/components/schemas/Task"
                 }
               }
             }
@@ -100,13 +100,13 @@
         }
       }
     },
-    "/books/{id}": {
+    "/tasks/{id}": {
       "parameters": [
         {
           "name": "id",
           "in": "path",
           "required": true,
-          "description": "Book id",
+          "description": "Task id",
           "schema": {
             "type": "integer",
             "example": 1
@@ -114,28 +114,28 @@
         }
       ],
       "get": {
-        "summary": "Get one book",
-        "operationId": "getBook",
+        "summary": "Get one task",
+        "operationId": "getTask",
         "responses": {
           "200": {
-            "description": "Book found",
+            "description": "Task found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Book"
+                  "$ref": "#/components/schemas/Task"
                 }
               }
             }
           },
           "404": {
-            "description": "Book not found",
+            "description": "Task not found",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "error": "Book 99 not found"
+                  "error": "Task 99 not found"
                 }
               }
             }
@@ -143,25 +143,25 @@
         }
       },
       "put": {
-        "summary": "Update a book",
-        "operationId": "updateBook",
+        "summary": "Update a task",
+        "operationId": "updateTask",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateBookRequest"
+                "$ref": "#/components/schemas/UpdateTaskRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Book updated",
+            "description": "Task updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Book"
+                  "$ref": "#/components/schemas/Task"
                 }
               }
             }
@@ -176,7 +176,7 @@
                 "examples": {
                   "emptyBody": {
                     "value": {
-                      "error": "request body must include title and/or available"
+                      "error": "request body must include title and/or done"
                     }
                   },
                   "emptyTitle": {
@@ -184,9 +184,9 @@
                       "error": "title cannot be empty"
                     }
                   },
-                  "invalidAvailable": {
+                  "invalidDone": {
                     "value": {
-                      "error": "availability status must be a boolean"
+                      "error": "done must be a boolean"
                     }
                   }
                 }
@@ -194,14 +194,14 @@
             }
           },
           "404": {
-            "description": "Book not found",
+            "description": "Task not found",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "error": "Book 99 not found"
+                  "error": "Task 99 not found"
                 }
               }
             }
@@ -209,21 +209,21 @@
         }
       },
       "delete": {
-        "summary": "Delete a book",
-        "operationId": "deleteBook",
+        "summary": "Delete a task",
+        "operationId": "deleteTask",
         "responses": {
           "204": {
-            "description": "Book deleted"
+            "description": "Task deleted"
           },
           "404": {
-            "description": "Book not found",
+            "description": "Task not found",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "error": "Book 99 not found"
+                  "error": "Task 99 not found"
                 }
               }
             }
@@ -233,11 +233,11 @@
     },
     "/stats": {
       "get": {
-        "summary": "Book counts",
+        "summary": "Task counts",
         "operationId": "getStats",
         "responses": {
           "200": {
-            "description": "Aggregate book statistics",
+            "description": "Aggregate task statistics",
             "content": {
               "application/json": {
                 "schema": {
@@ -251,17 +251,17 @@
     },
     "/reset": {
       "post": {
-        "summary": "Reset to book data",
-        "operationId": "resetBooks",
+        "summary": "Reset to seed data",
+        "operationId": "resetTasks",
         "responses": {
           "200": {
-            "description": "Book data restored",
+            "description": "Seed tasks restored",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Book"
+                    "$ref": "#/components/schemas/Task"
                   }
                 }
               }
@@ -273,9 +273,9 @@
   },
   "components": {
     "schemas": {
-      "Book": {
+      "Task": {
         "type": "object",
-        "required": ["id", "title", "available"],
+        "required": ["id", "title", "done"],
         "properties": {
           "id": {
             "type": "integer",
@@ -283,33 +283,33 @@
           },
           "title": {
             "type": "string",
-            "example": "East of Eden"
+            "example": "Buy groceries"
           },
-          "available": {
+          "done": {
             "type": "boolean",
             "example": false
           }
         }
       },
-      "CreateBookRequest": {
+      "CreateTaskRequest": {
         "type": "object",
         "required": ["title"],
         "properties": {
           "title": {
             "type": "string",
-            "example": "Kite Runner"
+            "example": "Buy milk"
           }
         }
       },
-      "UpdateBookRequest": {
+      "UpdateTaskRequest": {
         "type": "object",
         "minProperties": 1,
         "properties": {
           "title": {
             "type": "string",
-            "example": "The Art of Overthinking"
+            "example": "Buy oat milk"
           },
-          "available": {
+          "done": {
             "type": "boolean",
             "example": true
           }
@@ -326,13 +326,13 @@
       },
       "Stats": {
         "type": "object",
-        "required": ["total", "available", "open"],
+        "required": ["total", "done", "open"],
         "properties": {
           "total": {
             "type": "integer",
             "example": 7
           },
-          "available": {
+          "done": {
             "type": "integer",
             "example": 3
           },
