@@ -11,3 +11,16 @@ app.use(express.json());
 app.listen(port, () => {
   console.log(`CRUD API listening on port ${port}`);
 });
+app.get('/', (req, res) => {
+  
+  res.json({
+    name: 'Task API',
+    version: '1.0',
+    endpoints: ['/tasks', '/stats', '/reset'],
+  });
+});
+
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
