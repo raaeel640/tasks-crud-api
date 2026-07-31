@@ -5,12 +5,34 @@ const app = express();
 const port = 3000;
 app.use(express.json());
 
+
+const MY_TASKS = [
+ 
+  { id: 1, title: 'Complete CRUD API Assignment', done: false },
+  { id: 2, title: 'Crocheting', done: true },
+  { id: 3, title: 'reel editing', done: false },
+  { id :4, title:'Learn CSS', done:true},
+  { id:5, title: 'Shoppping', done:false},
+];
+
+
+const tasks = MY_TASKS.map((task) => ({ ...task }));
+
+
+function resetTasks() {
+
+  tasks.length = 0;
+  tasks.push(...MY_TASKS.map((task) => ({ ...task })));
+}
+
 // ---------------------------------------------------------------------------
-// Stage 0 — start the server
+// Stage 5 — Swagger UI at /docs
 // ---------------------------------------------------------------------------
-app.listen(port, () => {
-  console.log(`CRUD API listening on port ${port}`);
-});
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
+
+// ---------------------------------------------------------------------------
+// Stage 1 — the front door
+// ---------------------------------------------------------------------------
 app.get('/', (req, res) => {
   
   res.json({
@@ -25,28 +47,59 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// -------------------------------------------------------------------------
-//  Stage 2 
-//--------------------------------------------------------------------------
-const MY_TASKS = [
-  { id: 1, title: 'Complete CRUD API Assignment', done: false },
-  { id: 2, title: 'Crocheting', done: true },
-  { id: 3, title: 'Shopping', done: false },
-  { id: 4, title: 'Learn CSS', done: true },
-];
-const tasks = MY_TASKS.map((task) => ({ ...task }));
-
+// ---------------------------------------------------------------------------
+// Stage 2 — Read: list + single task (with optional filtering/search extras)
+// ---------------------------------------------------------------------------
 app.get('/tasks', (req, res) => {
+  let result = tasks;
+  
+
+  // Extras: GET /tasks?done=true  → only finished (or only open) tasks.
+  if (req.query.done !== undefined) {
+    
+    if (req.query.done !== 'true' && req.query.done !== 'false') {
+      return res.status(400).json({ error: 'done must be true or false' });
+    }
+    const done = req.query.done === 'true';
+    result = result.filter((t) => t.done === done);
+  }
+
+ 
+  if (req.query.search !== undefined) {
+    const word = String(req.query.search).trim();
+
+    if (word === '') {
+      return res.status(400).json({ error: 'search must not be empty' });
+    }
+    const lower = word.toLowerCase();
+  }
+    result = result.filter((t) => t.title.toLowerCase().includes(lower));
+   
+
+  res.json(result);
+});
+
+app.get('/stats', (req, res) => {
+
+  const done = tasks.filter((t) => t.done).length;
+
+  res.json({
+  
+    total: tasks.length,
+    
+    done,
+  
+    open: tasks.length - done,
+    
+  });
+});
+
+app.post('/reset', (req, res) => {
+  
+  resetTasks();
   res.json(tasks);
 });
-app.get('/tasks/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const task = tasks.find((t) => t.id === id);
-  if (!task) {
-    return res.status(404).json({ error: `Task ${id} not found` });
-  }
-  res.json(task);
-});
+
 // ---------------------------------------------------------------------------
 // Stage 3 — Create
 // ---------------------------------------------------------------------------
@@ -74,6 +127,7 @@ app.get('/tasks/:id', (req, res) => {
 
   res.json(task);
 });
+
 // ---------------------------------------------------------------------------
 // Stage 4 — Update & Delete
 // ---------------------------------------------------------------------------
@@ -126,6 +180,9 @@ app.delete('/tasks/:id', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Stage 5 — Swagger UI at /docs
+// Stage 0 — start the server
 // ---------------------------------------------------------------------------
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
+app.listen(port, () => {
+  console.log(`CRUD API listening on port ${port}`);
+});
+
